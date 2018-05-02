@@ -23,6 +23,7 @@ public class RSA {
 		sieveOfEratosthenes(N_key.intValue()/2);
 		generatePrimePairs();
 		checkPrimePairs();
+		//solveLinearCongruence(693647,4074, 874164);
 		System.out.println("\nPlain Text:  "+toPlainText());
 	}
 	/*public int[]  getLetters(String e) {
@@ -120,8 +121,11 @@ public class RSA {
 		return computeGCD(num2, num1%num2);
 	}
 	public int modInverse(int a, int m) {
+
+		System.out.println("GCD "+computeGCD(a, m));
+		
 	    int m0 = m;
-	    int y = 0, x = 1;
+	    int y = 0, x =1;
 	 
 	    if (m == 1)
 	       return 0;
@@ -138,12 +142,56 @@ public class RSA {
 	     }
 	     if (x < 0)
 	       x += m0;
-	 
-	     System.out.println("priv_key_D " +x);
 	     privKey_D = x;
 	     return x;
 	}
 	
+	public int modularInverse(int a , int m) {
+		int x = 0, y = 1, lastx = 1, lasty = 0, temp;
+        while (m != 0)
+        {
+            int q = a / m;
+            int r = a % m;
+ 
+            a = m;
+            m = r;
+ 
+            temp = x;
+            x = lastx - q * x;
+            lastx = temp;
+ 
+            temp = y;
+            y = lasty - q * y;
+            lasty = temp;            
+        }
+        System.out.println("Roots  x : "+ lastx +" y :"+ lasty);
+      
+        return lastx;
+	}
+	public void solveLinearCongruence(int a, long b,int m) {
+		int gcd = computeGCD(a, m);
+
+		if (b%gcd == 0) {
+			int a1 = a/gcd;
+			int m1 = m/gcd;
+			long b1 = b/gcd;
+			int x = modInverse(a1,m1);
+			
+			long num1 = x*b1;
+			long sol = num1 - (m1)*(num1/m1);
+			
+			long[] solutions = new long[gcd];
+			
+			System.out.println("\nSolutions less than " + m);
+			for(int i = 0; i < solutions.length; i++) {
+				solutions[i] = sol + m1*i;
+				System.out.println("\tSolution " + (i+1) + ": "+ solutions[i]);
+			}
+		}
+		else {
+			System.out.println("No solutions can be found");
+		}
+	}
 	public String toPlainText() {
 		String toConvert = decrypt();
 		String plainText = "";
